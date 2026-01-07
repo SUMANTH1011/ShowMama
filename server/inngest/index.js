@@ -1,6 +1,8 @@
 import { Inngest } from "inngest";
 import User from "../models/User.js";
 import connectDB from "../configs/db.js";
+import mongoose from "mongoose";
+
 
 export const inngest = new Inngest({ id: "showmama" });
 /* ================= USER CREATED ================= */
@@ -9,6 +11,8 @@ const syncUserCreation = inngest.createFunction(
   { event: "clerk/user.created" },
   async ({ event }) => {
     await connectDB();
+    console.log("DB name:", mongoose.connection.db.databaseName);
+
       const {
         id,
         first_name,
