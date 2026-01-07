@@ -3,7 +3,6 @@ import User from "../models/User.js";
 import connectDB from "../configs/db.js";
 
 export const inngest = new Inngest({ id: "showmama" });
-
 /* ================= USER CREATED ================= */
 const syncUserCreation = inngest.createFunction(
   { id: "sync-user-from-clerk" },
@@ -46,6 +45,7 @@ const syncUserUpdation = inngest.createFunction(
   { event: "clerk/user.updated" },
   async ({ event }) => {
     await connectDB();
+
    const {
         id,
         first_name,
