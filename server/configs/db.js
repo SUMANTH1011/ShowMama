@@ -1,16 +1,14 @@
-import sqlite3 from 'sqlite3';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import mongoose from "mongoose";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const dbPath = path.join(__dirname, '..', 'database.db');
-const db = new sqlite3.Database(dbPath, (err) => {
-    if (err) {
-        console.error('Could not connect to database', err);}
-    else {
-        console.log('Connected to SQLite database');
-    } 
-});
-export default db;
+const connectDB = async () => {
+    try{
+        mongoose.connection.on('connected', () => {
+            console.log('MongoDB connected successfully');
+        });
+        await mongoose.connect(`${process.env.MONGO_URI}/showmama`);
+    }
+    catch(err){
+        console.error("Database connection error:", err);
+    }
+}
+export default connectDB;
