@@ -20,13 +20,19 @@ export const stripeWebhook = async (req, res) => {
   try {
     switch (event.type) {
       case 'payment_intent.succeeded': {
-        const session = event.data.object;
+        const paymentIntent = event.data.object;
 
-        const bookingId = session.metadata?.bookingId;
+        const sessions = await stripeInstance.checkout.sessions.list({
+          payment_intent: paymentIntent.id,
+        });
+
+        const session = sessions.data[0];
+
+        const bookingId = session?.metadata?.bookingId;
 
         if (!bookingId) {
-          console.log('No bookingId found in metadata');
-          return res.json({ received: true });
+          console.log('No bookingId found');
+          break;
         }
 
         await Booking.findByIdAndUpdate(bookingId, {
@@ -39,7 +45,7 @@ export const stripeWebhook = async (req, res) => {
           data: { bookingId },
         });
 
-        console.log('Payment successful for booking:', bookingId);
+        console.log('Payment updated:', bookingId);
         break;
       }
 
