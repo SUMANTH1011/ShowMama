@@ -64,35 +64,33 @@ const releaseSeatsAndDeleteBooking = inngest.createFunction(
   { id: 'release-seats-and-delete-booking' },
   { event: 'app/checkpayment' },
   async ({ event, step }) => {
-
     const tenMinsLater = new Date(Date.now() + 10 * 60 * 1000);
     await step.sleepUntil('wait-for-10-mins', tenMinsLater);
 
     await step.run('check-payment-status', async () => {
-
       const { bookingId } = event.data;
 
       if (!bookingId) {
-        console.log("No bookingId received");
+        console.log('No bookingId received');
         return;
       }
 
       const booking = await Booking.findById(bookingId);
 
       if (!booking) {
-        console.log("Booking already deleted or not found");
+        console.log('Booking already deleted or not found');
         return;
       }
 
       if (booking.isPaid) {
-        console.log("Booking already paid, nothing to release");
+        console.log('Booking already paid, nothing to release');
         return;
       }
 
       const show = await Show.findById(booking.show);
 
       if (!show) {
-        console.log("Show not found");
+        console.log('Show not found');
         return;
       }
 
@@ -106,11 +104,10 @@ const releaseSeatsAndDeleteBooking = inngest.createFunction(
 
       await Booking.findByIdAndDelete(booking._id);
 
-      console.log("Seats released and booking deleted");
+      console.log('Seats released and booking deleted');
     });
   }
 );
-
 
 // Inggest function to send email to user after successful payment
 
@@ -119,54 +116,61 @@ const sendBookingConfirmationEmail = inngest.createFunction(
   { event: 'app/show.booked' },
   async ({ event, step }) => {
     const { bookingId } = event.data;
-    const booking = await Booking.findById(bookingId)
-      .populate({
-        path: 'show',
-        populate: { path: 'movie', model: 'Movie', select: 'title' },
-      })
-      .populate('user');
+
+    const booking = await Booking.findById(bookingId).populate({
+      path: 'show',
+      populate: { path: 'movie', model: 'Movie', select: 'title' },
+    });
+
+    if (!booking) {
+      console.log('Booking not found');
+      return;
+    }
+
+    // 🔥 Fetch user from Clerk
+    const clerkUser = await clerkClient.users.getUser(booking.user);
+
+    if (!clerkUser) {
+      console.log('Clerk user not found');
+      return;
+    }
+
+    const email = clerkUser.emailAddresses[0]?.emailAddress;
+    const name = clerkUser.firstName || 'User';
+
+    if (!email) {
+      console.log('User has no email');
+      return;
+    }
 
     await sendEmail({
-      to: booking.user.email,
+      to: email,
       subject: `🎬 Booking Confirmed – ${booking.show.movie.title}`,
       body: `
-    <div style="font-family: Arial, sans-serif; background-color:#f9f9f9; padding:20px;">
-      <div style="max-width:600px; margin:auto; background:white; padding:25px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
-        
-        <h2 style="color:#e50914; margin-bottom:10px;">🎟 Booking Confirmed!</h2>
-        
-        <p style="font-size:16px;">Hi <strong>${booking.user.name}</strong>,</p>
-        
-        <p style="font-size:15px; line-height:1.6;">
-          Great news! Your tickets for 
-          <strong>${booking.show.movie.title}</strong> have been successfully booked.
-        </p>
+      <div style="font-family: Arial, sans-serif; background-color:#f9f9f9; padding:20px;">
+        <div style="max-width:600px; margin:auto; background:white; padding:25px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.05);">
+          
+          <h2 style="color:#e50914;">🎟 Booking Confirmed!</h2>
+          
+          <p>Hi <strong>${name}</strong>,</p>
+          
+          <p>
+            Your tickets for <strong>${booking.show.movie.title}</strong> have been successfully booked.
+          </p>
 
-        <hr style="margin:20px 0; border:none; border-top:1px solid #eee;" />
+          <hr/>
 
-        <h3 style="margin-bottom:10px;">📅 Show Details:</h3>
-        <p><strong>Date:</strong> ${booking.show.showDateTime}</p>
-        <p><strong>Seats:</strong> ${booking.bookedSeats.join(', ')}</p>
-        <p><strong>Total Amount:</strong> $${booking.amount}</p>
+          <p><strong>Seats:</strong> ${booking.bookedSeats.join(', ')}</p>
+          <p><strong>Total Amount:</strong> $${booking.amount}</p>
 
-        <hr style="margin:20px 0; border:none; border-top:1px solid #eee;" />
+          <hr/>
 
-        <p style="font-size:14px; color:#555;">
-          Please arrive at least 15 minutes before the show time.
-          Show this confirmation email at the theatre entrance.
-        </p>
+          <p>Please arrive 15 minutes early and show this email at entry.</p>
 
-        <p style="margin-top:25px; font-size:14px;">
-          🍿 Enjoy your movie experience with <strong>ShowMama</strong>!
-        </p>
-
-        <p style="font-size:13px; color:#999; margin-top:20px;">
-          If you have any questions, feel free to contact our support team.
-        </p>
-        
+          <p>🍿 Enjoy your movie with <strong>ShowMama</strong>!</p>
+        </div>
       </div>
-    </div>
-  `,
+      `,
     });
   }
 );
