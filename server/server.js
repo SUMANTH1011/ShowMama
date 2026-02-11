@@ -15,7 +15,7 @@ const app = express();
 const port = 3000;
 
 // Middleware
-app.use('/api/stripe',express.raw({type:'application/json'}),stripeWebhook);
+app.use('/api/stripe/webhook',express.raw({type:'application/json'}),stripeWebhook);
 app.use(express.json());
 app.use(cors());
 app.use(clerkMiddleware());
