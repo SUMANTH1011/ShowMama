@@ -64,26 +64,53 @@ const releaseSeatsAndDeleteBooking = inngest.createFunction(
   { id: 'release-seats-and-delete-booking' },
   { event: 'app/checkpayment' },
   async ({ event, step }) => {
+
     const tenMinsLater = new Date(Date.now() + 10 * 60 * 1000);
     await step.sleepUntil('wait-for-10-mins', tenMinsLater);
 
     await step.run('check-payment-status', async () => {
-      const { bookingId } = event.data.bookingId;
+
+      const { bookingId } = event.data;
+
+      if (!bookingId) {
+        console.log("No bookingId received");
+        return;
+      }
+
       const booking = await Booking.findById(bookingId);
 
-      if (!booking.isPaid) {
-        // Release the seats
-        const show = await Show.findById(booking.show);
-        booking.bookedSeats.forEach((seat) => {
-          delete show.occupiedSeats[seat];
-        });
-        show.markModified('occupiedSeats');
-        await show.save();
-        await Booking.findByIdAndDelete(booking._id);
+      if (!booking) {
+        console.log("Booking already deleted or not found");
+        return;
       }
+
+      if (booking.isPaid) {
+        console.log("Booking already paid, nothing to release");
+        return;
+      }
+
+      const show = await Show.findById(booking.show);
+
+      if (!show) {
+        console.log("Show not found");
+        return;
+      }
+
+      // Release seats
+      booking.bookedSeats.forEach((seat) => {
+        delete show.occupiedSeats[seat];
+      });
+
+      show.markModified('occupiedSeats');
+      await show.save();
+
+      await Booking.findByIdAndDelete(booking._id);
+
+      console.log("Seats released and booking deleted");
     });
   }
 );
+
 
 // Inggest function to send email to user after successful payment
 
