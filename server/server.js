@@ -9,16 +9,17 @@ import showRouter from './routes/showRoutes.js';
 import bookingRouter from "./routes/bookingRoutes.js";
 import adminRoter from "./routes/adminRoutes.js";
 import userRouter from "./routes/userRoutes.js";
+import { stripeWebhook } from "./controllers/stripeWebhooks.js";
 
 const app = express();
 const port = 3000;
 
 // Middleware
+app.use('/api/stripe',express.raw({type:'application/json'}),stripeWebhook);
 app.use(express.json());
 app.use(cors());
 app.use(clerkMiddleware());
 
-// 🔥 MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.error("MongoDB Error:", err));

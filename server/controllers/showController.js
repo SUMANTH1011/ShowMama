@@ -94,17 +94,20 @@ export const addShow = async (req, res) => {
 
 // API to get shows from the database
 export const getShows = async (req, res) => {
-    try{
-        const shows=await Show.find({showDateTime:{$gte:new Date()}}).populate('movie').sort({showDateTime:1});
-        // filter unique shows
-        const uniqueShows=new Set(shows.map(show=>show.movie));
-        res.json({ success: true, shows:Array.from(uniqueShows) });
-    }
-    catch(err){
-        console.error("Get Shows Error:", err);
-        res.status(500).json({ success: false, message: "Internal server error" });
-    }
-}
+  try {
+    const shows = await Show.find({
+      showDateTime: { $gte: new Date() }
+    })
+      .populate('movie')
+      .sort({ showDateTime: 1 });
+
+    res.json({ success: true, shows }); // ✅ send full shows
+  } catch (err) {
+    console.error("Get Shows Error:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};
+
 
 // API to get a single show from the database
 export const getShow=async(req,res)=>{

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
@@ -12,6 +11,7 @@ import { Toaster } from 'react-hot-toast';
 import Layout from './pages/admin/Layout';
 import Dashboard from './pages/admin/Dashboard';
 import AddShows from './pages/admin/AddShows';
+import Loading from './components/Loading';
 import ListShows from './pages/admin/ListShows';
 import ListBookings from './pages/admin/ListBookings';
 import { useAppContext } from './context/AppContext';
@@ -32,6 +32,7 @@ const App = () => {
         <Route exact path="/movies/:id" element={<MovieDetails />} />
         <Route exact path="/movies/:id/:date" element={<SearLayout />} />
         <Route exact path="/my-bookings" element={<MyBookings />} />
+        <Route exact path="/loading/:nextUrl" element={<Loading />} />
         <Route exact path="/favorites" element={<Favorite />} />
         <Route
           path="/admin/*"

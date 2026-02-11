@@ -19,7 +19,7 @@ export const getDashboardStats=async(req,res)=>{
             totalBookings:bookings.length,
             totalRevenue:bookings.reduce((acc,booking)=>acc+booking.amount,0),
             totalUsers:totalUsers,
-            activeShows:activeShows.length,
+            activeShows:activeShows
         };
         res.json({ success: true, dashboardStats });
     }
