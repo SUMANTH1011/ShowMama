@@ -1,4 +1,5 @@
 import { Inngest } from 'inngest';
+import { clerkClient } from "@clerk/express";
 import User from '../models/User.js';
 import connectDB from '../configs/db.js';
 import mongoose from 'mongoose';
@@ -64,6 +65,7 @@ const releaseSeatsAndDeleteBooking = inngest.createFunction(
   { id: 'release-seats-and-delete-booking' },
   { event: 'app/checkpayment' },
   async ({ event, step }) => {
+     await connectDB(); 
     const tenMinsLater = new Date(Date.now() + 10 * 60 * 1000);
     await step.sleepUntil('wait-for-10-mins', tenMinsLater);
 
@@ -115,6 +117,7 @@ const sendBookingConfirmationEmail = inngest.createFunction(
   { id: 'send-booking-confirmation-email' },
   { event: 'app/show.booked' },
   async ({ event, step }) => {
+     await connectDB(); 
     const { bookingId } = event.data;
 
     const booking = await Booking.findById(bookingId).populate({

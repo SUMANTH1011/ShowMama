@@ -19,7 +19,7 @@ export const stripeWebhook = async (req, res) => {
   }
   try {
     switch (event.type) {
-      case 'checkout.session.completed': {
+      case 'payment_intent.succeeded': {
         const session = event.data.object;
 
         const bookingId = session.metadata?.bookingId;
