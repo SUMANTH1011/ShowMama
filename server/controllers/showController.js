@@ -3,6 +3,7 @@ import Movie from '../models/Movie.js';
 import Show from '../models/Show.js';
 import { inngest } from '../inngest/index.js';
 import connectDB from '../configs/db.js';
+import Booking from "../models/Booking.js";
 
 const tmdbHeaders = {
   accept: 'application/json',
@@ -11,7 +12,7 @@ const tmdbHeaders = {
 
 export const getNowPlayingMovies = async (req, res) => {
   try {
-    await connectDB(); 
+    await connectDB();
     const response = await axios.get(
       'https://api.themoviedb.org/3/movie/now_playing',
       { headers: tmdbHeaders }
@@ -30,7 +31,7 @@ export const getNowPlayingMovies = async (req, res) => {
 // API to add a new show
 export const addShow = async (req, res) => {
   try {
-    await connectDB(); 
+    await connectDB();
     const { movieId, showsInput, showPrice } = req.body;
 
     if (!movieId || !showsInput || !showPrice) {
@@ -106,26 +107,54 @@ export const addShow = async (req, res) => {
 };
 
 // API to get shows from the database
+
 export const getShows = async (req, res) => {
   try {
-    await connectDB(); 
+    await connectDB();
+
     const shows = await Show.find({
       showDateTime: { $gte: new Date() },
     })
-      .populate('movie')
+      .populate("movie")
       .sort({ showDateTime: 1 });
 
-    res.json({ success: true, shows }); // ✅ send full shows
+    // Get booking counts grouped by show
+    const bookingStats = await Booking.aggregate([
+      { $match: { isPaid: true } },
+      {
+        $group: {
+          _id: "$show",
+          totalBookings: { $sum: 1 },
+        },
+      },
+    ]);
+    const bookingMap = {};
+    bookingStats.forEach((item) => {
+      bookingMap[item._id.toString()] = item.totalBookings;
+    });
+
+    const updatedShows = shows.map((show) => {
+      const totalBookings = bookingMap[show._id.toString()] || 0;
+
+      return {
+        ...show.toObject(),
+        totalBookings,
+        earnings: totalBookings * show.showPrice,
+      };
+    });
+
+    res.json({ success: true, shows: updatedShows });
+
   } catch (err) {
-    console.error('Get Shows Error:', err);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    console.error("Get Shows Error:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
 // API to get a single show from the database
 export const getShow = async (req, res) => {
   try {
-    await connectDB(); 
+    await connectDB();
     const { movieId } = req.params;
     const shows = await Show.find({
       movie: movieId,
