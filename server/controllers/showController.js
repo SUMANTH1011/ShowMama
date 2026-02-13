@@ -2,6 +2,7 @@ import axios from 'axios';
 import Movie from '../models/Movie.js';
 import Show from '../models/Show.js';
 import { inngest } from '../inngest/index.js';
+import connectDB from '../configs/db.js';
 
 const tmdbHeaders = {
   accept: 'application/json',
@@ -10,6 +11,7 @@ const tmdbHeaders = {
 
 export const getNowPlayingMovies = async (req, res) => {
   try {
+    await connectDB(); 
     const response = await axios.get(
       'https://api.themoviedb.org/3/movie/now_playing',
       { headers: tmdbHeaders }
@@ -28,6 +30,7 @@ export const getNowPlayingMovies = async (req, res) => {
 // API to add a new show
 export const addShow = async (req, res) => {
   try {
+    await connectDB(); 
     const { movieId, showsInput, showPrice } = req.body;
 
     if (!movieId || !showsInput || !showPrice) {
@@ -105,6 +108,7 @@ export const addShow = async (req, res) => {
 // API to get shows from the database
 export const getShows = async (req, res) => {
   try {
+    await connectDB(); 
     const shows = await Show.find({
       showDateTime: { $gte: new Date() },
     })
@@ -121,6 +125,7 @@ export const getShows = async (req, res) => {
 // API to get a single show from the database
 export const getShow = async (req, res) => {
   try {
+    await connectDB(); 
     const { movieId } = req.params;
     const shows = await Show.find({
       movie: movieId,

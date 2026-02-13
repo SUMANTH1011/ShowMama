@@ -6,7 +6,6 @@ if (!MONGO_URI) {
   throw new Error("❌ MONGO_URI is not defined in environment variables");
 }
 
-// Global cache for Vercel serverless
 let cached = global.mongoose;
 
 if (!cached) {
@@ -17,16 +16,14 @@ if (!cached) {
 }
 
 const connectDB = async () => {
-  // If already connected, reuse connection
+ 
   if (cached.conn) {
     return cached.conn;
   }
-
-  // If no connection promise exists, create one
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGO_URI, {
-      bufferCommands: false, // prevents buffering timeout
-      serverSelectionTimeoutMS: 5000, // fail fast instead of waiting 10s
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 5000, 
     }).then((mongooseInstance) => {
       console.log("✅ MongoDB connected successfully");
       return mongooseInstance;
