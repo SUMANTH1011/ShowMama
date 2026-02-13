@@ -5,6 +5,8 @@
 import Booking from "../models/Booking.js";
 import show from "../models/Show.js";
 import User from "../models/User.js";
+import connectDB from "../config/db.js";
+
 
 export const isAdmin=async(req,res)=>{
     res.json({ success: true, isAdmin: true, message: "User is admin" });
@@ -12,6 +14,7 @@ export const isAdmin=async(req,res)=>{
 // API to get dashboard stats
 export const getDashboardStats=async(req,res)=>{
     try{
+        await connectDB();
         const bookings=await Booking.find({isPaid:true});
         const activeShows=await show.find({showDateTime:{$gte:new Date()}}).populate('movie');
         const totalUsers=await User.countDocuments();
@@ -32,6 +35,7 @@ export const getDashboardStats=async(req,res)=>{
 // API to get all shows 
 export const getAllShows=async(req,res)=>{
     try{
+        await connectDB();
         const shows=await show.find({showDateTime:{$gte:new Date()}}).populate('movie').sort({showDateTime:1});
         res.json({ success: true, shows });
     }
@@ -44,6 +48,7 @@ export const getAllShows=async(req,res)=>{
 // API to get all bookings
 export const getAllBookings=async(req,res)=>{
     try{
+        await connectDB();
         const bookings=await Booking.find({}).populate('user').populate({
             path:'show',
             populate:{

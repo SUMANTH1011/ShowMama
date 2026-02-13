@@ -1,12 +1,14 @@
 import { clerkClient } from "@clerk/express";
 import Booking from "../models/Booking.js";
 import Movie from "../models/Movie.js";
-
+import connectDB from "../configs/db.js";
 
 // API Controller Functions to Get User Bookings
 export const getUserBookings = async (req, res) => {
     try
     {
+      await connectDB();
+
         const {userId}=req.auth();
         const bookings=await Booking.find({user:userId}).populate({
             path:'show',
@@ -25,6 +27,7 @@ export const getUserBookings = async (req, res) => {
 // API Controller Function to Update Favorite Movie in Clerk User Metadata
 export const updateFavoriteMovie = async (req, res) => {
   try {
+    await connectDB();
     const { userId } = req.auth();
     const { movieId } = req.body;
 
@@ -71,6 +74,7 @@ export const updateFavoriteMovie = async (req, res) => {
 // API Controller Function to Get Favorite Movies from Clerk User Metadata
 export const getFavoriteMovies = async (req, res) => {
   try {
+    await connectDB();
     const { userId } = req.auth();
 
     if (!userId) {
