@@ -1,7 +1,6 @@
-Full-Stack MERN Movie Ticket Booking Platform
+🎬 ShowMama – Full-Stack MERN Movie Ticket Booking Platform
 
-
-ShowMama is a production-ready movie ticket booking platform built using the MERN stack.
+ShowMama is a production-ready movie ticket booking platform built using the MERN Stack.
 It supports secure authentication, Stripe payments, background job processing, automated emails, and an admin dashboard for managing shows.
 
 🚀 Live Demo
@@ -11,71 +10,64 @@ It supports secure authentication, Stripe payments, background job processing, a
 🌐 Backend API: 
 
 ✨ Features
-👤 User Features
+  👤 User Features
 
-🔐 Secure Authentication (Clerk)
+  🔐 Secure Authentication (Clerk)
 
-🎬 Browse Now Playing Movies
+  🎬 Browse Now Playing Movies
 
-❤️ Add Movies to Favorites
+  ❤️ Add Movies to Favorites
 
-🎟 Seat Selection & Ticket Booking
+  🎟 Seat Selection & Ticket Booking
 
-💳 Stripe Checkout Integration
+  💳 Stripe Checkout Integration
 
-📩 Booking Confirmation Emails (Resend)
-
-⏰ Automated Show Reminder Emails (Inngest)
-
-📄 View Booking History
+  📩 Booking Confirmation Emails (Resend)
 
 🛠 Admin Features
 
-➕ Add Shows (Date & Time)
+  ➕ Add Shows (Date & Time)
 
-💰 Set Show Price
+  💰 Set Show Price
 
-🗑 Delete Shows
+  🗑 Delete Shows
 
-🎥 Manage Movie Listings
+  🎥 Manage Movie Listings
 
-📊 Dashboard Controls
-
+  📊 Dashboard Controls
 🏗 Tech Stack
 Frontend
 
-React (Vite)
+  React (Vite)
 
-TailwindCSS
+  TailwindCSS
 
-Axios
+  Axios
 
-Clerk Authentication
+  Clerk Authentication
 
 Backend
 
-Node.js
+  Node.js
 
-Express.js
+  Express.js
 
-MongoDB Atlas
+  MongoDB Atlas
 
-Mongoose
+  Mongoose
 
-Stripe API
+  Stripe API
 
-Resend (Email Service)
+  Resend (Email Service)
 
-Inngest (Background Jobs)
+  Inngest (Background Jobs)
+🚀 Deployment
 
-Deployment
+  Frontend & Backend: Vercel
 
-Vercel (Frontend + Serverless Backend)
-
-MongoDB Atlas (Cloud Database)
-
+  Database: MongoDB Atlas
 📂 Project Structure
-showmama/
+  showmama/
 │
 ├── client/                 # React Frontend
 │   ├── components/
@@ -92,105 +84,89 @@ showmama/
 │   └── server.js
 │
 └── README.md
-
 ⚙️ Environment Variables
 🔹 Backend (.env)
-PORT=5000
+  PORT=5000
 
-MONGO_URI=your_mongodb_connection_string
+  MONGO_URI=your_mongodb_connection_string
 
-CLERK_SECRET_KEY=your_clerk_secret
-CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+  CLERK_SECRET_KEY=your_clerk_secret
+  CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 
-STRIPE_SECRET_KEY=your_stripe_secret_key
-STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
+  STRIPE_SECRET_KEY=your_stripe_secret_key
+  STRIPE_WEBHOOK_SECRET=your_stripe_webhook_secret
 
-RESEND_API_KEY=your_resend_api_key
-SENDER_EMAIL=no-reply@yourdomain.com
-
+  RESEND_API_KEY=your_resend_api_key
+  SENDER_EMAIL=no-reply@yourdomain.com
 🔹 Frontend (.env)
-VITE_BACKEND_URL=https://your-backend-url.vercel.app
-VITE_CURRENCY=₹
+  VITE_BACKEND_URL=https://your-backend-url.vercel.app
+  VITE_CURRENCY=₹
+  🗄 Database Schema
+🎬 Movie
 
-🗄 Database Schema
-Movie
+  _id
 
-_id
+  title
 
-title
+  poster_path
 
-poster_path
+  release_date
 
-release_date
+  vote_average
 
-vote_average
+  vote_count
 
-vote_count
+🎭 Show
 
-Show
+  movie (ObjectId → Movie)
+  
+  showTime (Date)
 
-movie (ObjectId → Movie)
+  showPrice
 
-showTime (Date)
+  occupiedSeats
+  🎟 Booking
 
-showPrice
+  user
 
-occupiedSeats
+  show
 
-Booking
+  bookedSeats
 
-user
+  amount
 
-show
-
-bookedSeats
-
-amount
-
-paymentStatus
-
+  paymentStatus
 🔄 Background Jobs (Inngest)
-🎟 Booking Confirmation
+    🎟 Booking Confirmation
 
-Triggered when:
-
-app/show.booked
-
-
-Sends confirmation email.
-
+  Triggered when:
+  app/show.booked
+  Sends confirmation email.
 ⏰ Show Reminder
 
-Runs every 8 hours:
+  Runs every 8 hours:
 
-cron: 0 */8 * * *
-
-
-Sends reminder emails before show time.
-
+  cron: 0 */8 * * *
+  Sends reminder emails before show time.
 📢 New Show Notification
 
 Triggered when:
 
 app/show.added
-
-
 Notifies all users about new shows.
-
 💳 Stripe Payment Flow
 
-User selects seats
+  User selects seats
 
-Backend creates Stripe Checkout session
+  Backend creates Stripe Checkout session
 
-User completes payment
+  User completes payment
 
-Stripe Webhook verifies payment
+  Stripe Webhook verifies payment
 
-Booking status updated
+  Booking status updated
 
-Inngest triggers confirmation email
-
+  Inngest triggers confirmation email
 📧 Email Integration (Resend)
 import { Resend } from "resend";
 
@@ -200,20 +176,18 @@ await resend.emails.send({
   from: process.env.SENDER_EMAIL,
   to: userEmail,
   subject: "🎬 Booking Confirmed",
-  html: "<h1>Your ticket is confirmed!</h1>"
+  html: "<h2>Your ticket is confirmed!</h2>"
 });
 
 🧪 Running Locally
 1️⃣ Clone Repository
 git clone https://github.com/yourusername/showmama.git
 cd showmama
-
 2️⃣ Install Dependencies
 Frontend
 cd client
 npm install
 npm run dev
-
 Backend
 cd server
 npm install
@@ -237,7 +211,7 @@ Add VITE_BACKEND_URL
 
 Deploy client folder
 
-Redeploy after adding env variables
+Redeploy after adding environment variables
 
 🛡 Security
 
@@ -250,24 +224,6 @@ Stripe webhook signature verification
 MongoDB connection caching for serverless
 
 Environment variable protection
+⏰ Automated Show Reminder Emails (Inngest)
 
-📈 Future Improvements
-
-🤖 AI-based Movie Recommendations
-
-📊 Analytics Dashboard
-
-🎟 Real-time Seat Availability
-
-📱 Mobile App Version
-
-🎬 Trailer Integration
-
-👨‍💻 Author
-
-Sumanth Reddy
-Full Stack MERN Developer
-
-📜 License
-
-MIT License
+📄 View Booking History
