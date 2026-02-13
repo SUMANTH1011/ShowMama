@@ -5,7 +5,7 @@
 import Booking from "../models/Booking.js";
 import show from "../models/Show.js";
 import User from "../models/User.js";
-import connectDB from "../config/db.js";
+import connectDB from "../configs/db.js";
 
 
 export const isAdmin=async(req,res)=>{
